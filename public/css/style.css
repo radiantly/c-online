@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: grid;
+  grid-template-columns: 10px 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas: 
+    "status ccode ."
+    "status ccode output";
+  font-family: 'Source Code Pro', monospace;
+}
+
+.ccode-container {
+  grid-area: ccode;
+}
+.output {
+  grid-area: output;
+}
+.status {
+  grid-area: status;
+  --color-red: #FF4136;
+  --color-orange: #FF851B;
+  --color-green: #2ECC40;
+  background-color: var(--color-orange);
+  transition: background 0.3s ease;
+}
+.green {
+  background-color: var(--color-green);
+}
+.red {
+  background-color: var(--color-red);
+}
+.CodeMirror {
+  font-family: 'Source Code Pro', monospace;
+  height: 100%;
+}

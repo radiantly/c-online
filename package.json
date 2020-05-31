@@ -1,0 +1,27 @@
+{
+  "name": "c-online",
+  "version": "1.0.0",
+  "description": "This project allows you to run c code",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/radiantly/c-online.git"
+  },
+  "keywords": [
+    "c"
+  ],
+  "author": "radiantly",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/radiantly/c-online/issues"
+  },
+  "homepage": "https://github.com/radiantly/c-online#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
