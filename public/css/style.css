@@ -6,20 +6,28 @@ html, body {
 }
 
 body {
+  background-color: #171814;
   display: grid;
-  grid-template-columns: 10px 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 10px minmax(0, 1fr) 10px minmax(0, 1fr);
+  grid-template-rows: 1fr 10px 1fr;
   grid-template-areas: 
-    "status ccode ."
-    "status ccode output";
+    "status ccode . ."
+    "status ccode . ."
+    "status ccode . output";
   font-family: 'Source Code Pro', monospace;
 }
 
 .ccode-container {
   grid-area: ccode;
 }
+.ccode-container .CodeMirror {
+  padding-top: 10px;
+}
 .output {
   grid-area: output;
+}
+.output .CodeMirror {
+  padding: 10px;
 }
 .status {
   grid-area: status;

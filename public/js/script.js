@@ -7,24 +7,7 @@ int main() {
     return 0;
 }`;
 
-const handleCodeChange = (mirror, changeObj) => {
-  console.log(mirror);
-};
-
-const codeMirrorOptions = {
-  indentUnit: 4,
-  indentWithTabs: true,
-  theme: "monokai",
-  lineNumbers: true,
-  mode: "text/x-csrc",
-  matchBrackets: true
-};
-
-const ccode = document.getElementById("ccode");
-const mainCodeEditor = CodeMirror.fromTextArea(ccode, codeMirrorOptions);
-const statusDiv = document.getElementById("status");
-
-mainCodeEditor.on("change", (editor, changeObj) => {
+const handleCodeChange = editor => {
   const codeInBase64 = btoa(editor.getValue());
   location.hash = codeInBase64;
   fetch("/", {
@@ -37,17 +20,56 @@ mainCodeEditor.on("change", (editor, changeObj) => {
   })
     .then((response) => response.json())
     .then((result) => {
-      if (result.exit == 0) statusDiv.classList.replace("red", "green");
-      else statusDiv.classList.replace("green", "red");
+      console.log(result);
+      if (result.exitCode == 0) {
+        statusDiv.classList.replace("red", "green");
+        outputEditor.setValue("No errors :)");
+      } else {
+        statusDiv.classList.replace("green", "red");
+        outputEditor.setValue(result.errors.map(elem => elem.split("\n").map(line => line.replace(/^<stdin>:\s*/, '')).join("\n")).join("\n"));
+      }
     });
+};
+
+const mainCodeEditorOptions = {
+  indentUnit: 4,
+  indentWithTabs: true,
+  theme: "monokai",
+  lineNumbers: true,
+  mode: "text/x-csrc",
+  matchBrackets: true,
+  lineWrapping: true
+};
+
+const outputEditorOptions = {
+  value: "Output shows up here",
+  theme: "monokai",
+  readOnly: "nocursor",
+  lineWrapping: true
+}
+const ccode = document.getElementById("ccode");
+const statusDiv = document.getElementById("status");
+const outputDiv = document.getElementById("output");
+
+const mainCodeEditor = CodeMirror.fromTextArea(ccode, mainCodeEditorOptions);
+const outputEditor = CodeMirror(outputDiv, outputEditorOptions);
+
+let updateTimeout;
+mainCodeEditor.on("change", (editor, changeObj) => {
+  clearTimeout(updateTimeout);
+  updateTimeout = setTimeout(() => handleCodeChange(editor), 200);
 });
 
-if(location.hash) {
+if(location.hash)
   try {
     const decodedCode = atob(location.hash.substring(1));
     mainCodeEditor.setValue(decodedCode);
   } catch(err) {
     console.log(err);
     location.hash = "";
+    mainCodeEditor.setValue(defaultProgram);
   }
-}
+else
+  mainCodeEditor.setValue(defaultProgram);
+
+mainCodeEditor.refresh();

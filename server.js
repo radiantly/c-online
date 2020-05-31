@@ -13,7 +13,7 @@ app.post('/', async (req, res) => {
   if(!(req.body.hasOwnProperty('code')))
     return res.status(400).send("No code.");
   
-  const exitCode = await runCode(req.body.code);
-  res.status(200).json({exit: exitCode});
+  const responseObj = await runCode(req.body.code);
+  res.status(200).json(responseObj);
 });
 app.listen(3000);
