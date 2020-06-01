@@ -2,12 +2,13 @@ import WebSocket from 'ws';
 import { env } from 'process';
 import { runCode } from './modules/runCode.js';
 
-const wss = new WebSocket.Server({ port: env.port || 8000 });
+const wss = new WebSocket.Server({ port: env.PORT || 8000 });
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
-    const messageObj = JSON.parse(message)
-    runCode(messageObj.code)
-      .then(responseObj => ws.send(JSON.stringify(responseObj)));
+wss.on('connection', ws => {
+  ws.on('message', message => {
+    if(typeof message === 'string')
+      runCode(message)
+        .then(responseObj => ws.send(JSON.stringify(responseObj)))
+        .catch(err => console.error(err));
   });
 });

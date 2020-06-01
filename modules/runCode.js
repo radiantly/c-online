@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 
-export const runCode = codeInBase64 => {
+export const runCode = code => {
   return new Promise(resolve => {
     const gcc = spawn('gcc', ['-xc', '-fsyntax-only', '-']);
     const errors = []
@@ -12,7 +12,7 @@ export const runCode = codeInBase64 => {
       resolve({ exitCode: code, errors: errors});
     });
 
-    gcc.stdin.write(Buffer.from(codeInBase64, 'base64').toString())
+    gcc.stdin.write(code)
     gcc.stdin.end();
   });
 }

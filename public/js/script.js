@@ -89,9 +89,9 @@ server ? initializeSocket() : updateStatus('noserver');
 
 const handleCodeChange = () => {
   if(socket.readyState !== 1) return;
-  const codeInBase64 = btoa(mainCodeEditor.getValue());
-  location.hash = codeInBase64;
-  socket.send(`{ "code": "${codeInBase64}" }`);
+  const code = mainCodeEditor.getValue();
+  socket.send(code);
+  location.hash = btoa(code);
 };
 
 let updateTimeout;
