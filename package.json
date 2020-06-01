@@ -22,6 +22,6 @@
   },
   "homepage": "https://github.com/radiantly/c-online#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "ws": "^7.3.0"
   }
 }

@@ -47,7 +47,7 @@ body {
 .red {
   background-color: var(--color-red);
 }
-.green.red {
+.connecting {
   background-color: var(--color-orange);
 }
 .CodeMirror {

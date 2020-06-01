@@ -1,36 +1,9 @@
-const defaultProgram =
-`#include<stdio.h>
+const urlParams = new URLSearchParams(window.location.search);
+const server = urlParams.get("server");
 
-int main() {
-\t
-\tprintf("Hello World!");
-\t
-\treturn 0;
-}`;
-
-const handleCodeChange = editor => {
-  const codeInBase64 = btoa(editor.getValue());
-  location.hash = codeInBase64;
-  fetch("/", {
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json"
-    },
-    method: "post",
-    body: `{ "code": "${codeInBase64}" }`
-  })
-    .then((response) => response.json())
-    .then((result) => {
-      console.log(result);
-      if (result.exitCode == 0) {
-        statusDiv.classList.replace("red", "green");
-        outputEditor.setValue("No errors :)");
-      } else {
-        statusDiv.classList.replace("green", "red");
-        outputEditor.setValue(result.errors.map(elem => elem.split("\n").map(line => line.replace(/^<stdin>:\s*/, '')).join("\n")).join("\n"));
-      }
-    });
-};
+const ccode = document.getElementById("ccode");
+const statusDiv = document.getElementById("status");
+const outputDiv = document.getElementById("output");
 
 const mainCodeEditorOptions = {
   indentUnit: 4,
@@ -51,29 +24,99 @@ const outputEditorOptions = {
   lineWrapping: true,
   scrollbarStyle: "simple"
 }
-const ccode = document.getElementById("ccode");
-const statusDiv = document.getElementById("status");
-const outputDiv = document.getElementById("output");
 
 const mainCodeEditor = CodeMirror.fromTextArea(ccode, mainCodeEditorOptions);
 const outputEditor = CodeMirror(outputDiv, outputEditorOptions);
 
+let oldStatus;
+const updateStatus = status => {
+  if(status === oldStatus) return;
+  oldStatus = status;
+  switch(status) {
+    case 'green': statusDiv.classList.replace("red", "green"); break;
+    case 'red': statusDiv.classList.replace("green", "red"); break;
+    case 'connecting': statusDiv.classList.add("connecting");
+                       outputEditor.setValue("Connecting...");
+                       break;
+    case 'connected': statusDiv.classList.remove("connecting");
+                      statusDiv.classList.add("green");
+                      outputEditor.setValue("Connected.");
+                      break;
+    case 'noserver': outputEditor.setValue("No websocket server specified.");
+  }
+}
+
+let socket;
+const handleSocketOpen = event => {
+  console.info("[open] Connected!");
+  updateStatus('connected');
+};
+
+const handleSocketMessage = event => {
+  if(!event.data) return;
+  const result = JSON.parse(event.data);
+  console.log(result);
+  if (result.exitCode == 0) {
+    updateStatus('green');
+    outputEditor.setValue("No errors :)");
+  } else {
+    updateStatus('red');
+    outputEditor.setValue(result.errors.map(elem => elem.split("\n").map(line => line.replace(/^<stdin>:\s*/, '')).join("\n")).join("\n"));
+  }
+};
+
+const handleSocketClose = event => {
+  if (event.wasClean)
+    console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+  else
+    console.info('[close] Connection died');
+  updateStatus('connecting');
+  setTimeout(initializeSocket, 2000);
+};
+
+const handleSocketError = error => console.error(`[error] ${error.message}`);
+
+const initializeSocket = () => {
+  socket = new WebSocket(server);
+
+  socket.onopen = handleSocketOpen;
+  socket.onmessage = handleSocketMessage;
+  socket.onclose = handleSocketClose;
+  socket.onerror = handleSocketError;
+}
+
+server ? initializeSocket() : updateStatus('noserver');
+
+const handleCodeChange = () => {
+  if(socket.readyState !== 1) return;
+  const codeInBase64 = btoa(mainCodeEditor.getValue());
+  location.hash = codeInBase64;
+  socket.send(`{ "code": "${codeInBase64}" }`);
+};
+
 let updateTimeout;
 mainCodeEditor.on("change", (editor, changeObj) => {
   clearTimeout(updateTimeout);
-  updateTimeout = setTimeout(() => handleCodeChange(editor), 200);
+  updateTimeout = setTimeout(handleCodeChange, 200);
 });
+
+let startProgram =
+`#include<stdio.h>
+
+int main() {
+\t
+\tprintf("Hello World!");
+\t
+\treturn 0;
+}`;
 
 if(location.hash)
   try {
-    const decodedCode = atob(location.hash.substring(1));
-    mainCodeEditor.setValue(decodedCode);
+    startProgram = atob(location.hash.substring(1));
   } catch(err) {
     console.log(err);
     location.hash = "";
-    mainCodeEditor.setValue(defaultProgram);
   }
-else
-  mainCodeEditor.setValue(defaultProgram);
 
+mainCodeEditor.setValue(startProgram);
 mainCodeEditor.refresh();

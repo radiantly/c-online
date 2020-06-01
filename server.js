@@ -1,19 +1,13 @@
-import express from 'express';
+import WebSocket from 'ws';
+import { env } from 'process';
 import { runCode } from './modules/runCode.js';
-const app = express();
 
-app.use(express.static('public'));
-app.use(express.json())
+const wss = new WebSocket.Server({ port: env.port || 8000 });
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
+wss.on('connection', function connection(ws) {
+  ws.on('message', function incoming(message) {
+    const messageObj = JSON.parse(message)
+    runCode(messageObj.code)
+      .then(responseObj => ws.send(JSON.stringify(responseObj)));
+  });
 });
-
-app.post('/', async (req, res) => {
-  if(!(req.body.hasOwnProperty('code')))
-    return res.status(400).send("No code.");
-  
-  const responseObj = await runCode(req.body.code);
-  res.status(200).json(responseObj);
-});
-app.listen(3000);
