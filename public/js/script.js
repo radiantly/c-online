@@ -28,8 +28,11 @@ const outputEditorOptions = {
 const mainCodeEditor = CodeMirror.fromTextArea(ccode, mainCodeEditorOptions);
 const outputEditor = CodeMirror(outputDiv, outputEditorOptions);
 
+let queue = 0;
+
 let oldStatus;
 const updateStatus = status => {
+  if(!queue) outputDiv.classList.remove("queued");
   if(status === oldStatus) return;
   oldStatus = status;
   switch(status) {
@@ -53,9 +56,9 @@ const handleSocketOpen = event => {
 };
 
 const handleSocketMessage = event => {
+  queue -= 1;
   if(!event.data) return;
   const result = JSON.parse(event.data);
-  console.log(result);
   if (result.exitCode == 0) {
     updateStatus('green');
     outputEditor.setValue("No errors :)");
@@ -91,12 +94,15 @@ const handleCodeChange = () => {
   if(socket.readyState !== 1) return;
   const code = mainCodeEditor.getValue();
   socket.send(code);
+  queue += 1;
+  outputDiv.classList.add("queued");
   location.hash = btoa(code);
 };
 
 let updateTimeout;
 mainCodeEditor.on("change", (editor, changeObj) => {
   clearTimeout(updateTimeout);
+  if(!queue) return handleCodeChange();
   updateTimeout = setTimeout(handleCodeChange, 200);
 });
 

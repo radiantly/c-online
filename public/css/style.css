@@ -13,7 +13,7 @@ body {
   background-color: #171814;
   display: grid;
   grid-template-columns: 10px minmax(0, 1fr) 10px minmax(0, 1fr);
-  grid-template-rows: 1fr 10px 1fr;
+  grid-template-rows: 1fr 10px minmax(0, 1fr);
   grid-template-areas: 
     "status ccode . ."
     "status ccode . ."
@@ -59,4 +59,12 @@ body {
 .CodeMirror-matchingbracket {
   border-bottom: 1px solid #888;
   text-decoration: none !important;
+}
+
+.CodeMirror-lines {
+  transition: opacity 0.2s ease;
+}
+
+.queued .CodeMirror-lines {
+  opacity: 0.7
 }
