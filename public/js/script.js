@@ -38,14 +38,17 @@ const mainCodeEditorOptions = {
   lineNumbers: true,
   mode: "text/x-csrc",
   matchBrackets: true,
-  lineWrapping: true
+  lineWrapping: true,
+  autoCloseBrackets: true,
+  scrollbarStyle: "simple"
 };
 
 const outputEditorOptions = {
   value: "Output shows up here",
   theme: "monokai",
   readOnly: "nocursor",
-  lineWrapping: true
+  lineWrapping: true,
+  scrollbarStyle: "simple"
 }
 const ccode = document.getElementById("ccode");
 const statusDiv = document.getElementById("status");

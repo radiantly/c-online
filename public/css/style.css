@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   height: 100%;
@@ -14,7 +16,7 @@ body {
     "status ccode . ."
     "status ccode . ."
     "status ccode . output";
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Fira Code', monospace;
 }
 
 .ccode-container {
@@ -44,6 +46,7 @@ body {
   background-color: var(--color-red);
 }
 .CodeMirror {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Fira Code', monospace;
+  font-size: 15px;
   height: 100%;
 }
