@@ -1,10 +1,11 @@
 const defaultProgram =
 `#include<stdio.h>
-    
-int main() {
-    printf("Hello World!");
 
-    return 0;
+int main() {
+\t
+\tprintf("Hello World!");
+\t
+\treturn 0;
 }`;
 
 const handleCodeChange = editor => {

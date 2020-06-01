@@ -1,4 +1,6 @@
-* {
+.ccode-container,
+.CodeMirror
+{
   box-sizing: border-box;
 }
 
@@ -45,8 +47,16 @@ body {
 .red {
   background-color: var(--color-red);
 }
+.green.red {
+  background-color: var(--color-orange);
+}
 .CodeMirror {
   font-family: 'Fira Code', monospace;
   font-size: 15px;
   height: 100%;
+}
+
+.CodeMirror-matchingbracket {
+  border-bottom: 1px solid #888;
+  text-decoration: none !important;
 }
